@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 
 function getRange( index ) {
@@ -45,6 +45,7 @@ const defaultLayout = [
 ];
 
 function isOriginal( rows, ri, ci ) {
+  console.log( rows[ ri ][ ci ], defaultLayout[ ri ][ ci ] );
   return rows[ ri ][ ci ] === defaultLayout[ ri ][ ci ];
 }
 
@@ -136,10 +137,51 @@ const Cell = ( { value, original, possibilities } ) => {
 };
 
 function App() {
-  const [ rows, setRows ] = useState( defaultLayout );
+  const [ rows, setRows ] = useState( defaultLayout.map( row => [ ...row ] ) );
+
+  function updateCell( ri, ci, value ) {
+    setTimeout( () => {
+      const newRows = [ ...rows ];
+      newRows[ ri ][ ci ] = value;
+      setRows( newRows );
+    }, 500 );
+  }
 
   const cells = computeCells( rows );
 
+  useEffect( () => {
+    for ( let ri = 0; ri < 9; ri++ ) {
+      for ( let ci = 0; ci < 9; ci++ ) {
+        const cell = cells[ ri ][ ci ];
+        if ( cell.value || ! cell.possibilities ) {
+          continue;
+        }
+
+        if ( cell.possibilities.length === 1 ) {
+          updateCell( ri, ci, cell.possibilities[ 0 ] );
+          return;
+        }
+
+        // No easy out; check each possibility against square's other cells.
+        const square = getSquare( cells, ri, ci );
+        for ( let option of cell.possibilities ) {
+          let occurrences = 1;
+          for ( let neighbor of square ) {
+            if ( neighbor === cell || ! neighbor.possibilities ) {
+              continue;
+            }
+            if ( neighbor.possibilities.includes( option ) ) {
+              occurrences++;
+            }
+          }
+          if ( occurrences === 1 ) {
+            updateCell( ri, ci, option );
+            return;
+          }
+        }
+      }
+    }
+  } );
 
   return (
     <div className="App">

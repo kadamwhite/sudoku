@@ -34,27 +34,35 @@ td {
   margin: 0;
 
 }
+
 td span {
-  display: block;
+  display: inline-block;
   width: 2rem;
   height: 2rem;
-}
-.original {
-  font-weight: bold;
   line-height: 2rem;
   vertical-align: middle;
+  /* font-weight: lighter; */
 }
+
+.original {
+  font-weight: bold;
+}
+
 .guess {
   font-size: 8px;
-  font-weight: italic;
+  font-style: italic;
+  font-weight: normal;
   color: grey;
   vertical-align: top;
+  line-height: unset;
   text-align: left;
 }
+
 td:nth-of-type(3),
 td:nth-of-type(6) {
   border-right: 2px solid black;
 }
+
 td:last-of-type {
   border-right: none;
 }
