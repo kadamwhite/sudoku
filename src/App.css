@@ -90,6 +90,7 @@ td:last-of-type {
   border-right: none;
 }
 
+tr:nth-of-type(9) td,
 tr:last-of-type td {
   border-bottom: none;
 }

@@ -49,9 +49,7 @@ function isOriginal( rows, ri, ci ) {
 }
 
 function canCellBe( rows, ri, ci, guess ) {
-  if ( ri === 5 && ci === 7 ) console.log( `checking ${ guess }` );
   if ( rows[ ri ][ ci ] === guess ) {
-    if ( ri === 5 && ci === 7 ) console.log( `value already is ${ guess }` );
     return true;
   }
   for ( let num of getRow( rows, ri ) ) {
@@ -63,7 +61,6 @@ function canCellBe( rows, ri, ci, guess ) {
   for ( let num of getSquare( rows, ri, ci ) ) {
     if ( num === guess ) return false;
   }
-  if ( ri === 5 && ci === 7 ) console.log( `could be ${ guess }` );
   return true;
 }
 
@@ -138,7 +135,6 @@ const Cell = ( { value, original, possibilities, onClick } ) => {
 };
 
 const ValidationCell = ( { set } ) => {
-  console.log( set );
   if ( ! complete( set ) ) {
     return (
       <td className="validation" />
