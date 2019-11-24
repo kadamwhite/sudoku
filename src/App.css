@@ -7,16 +7,50 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #fff;
+  color: black;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
 }
 
 .App-link {
   color: #09d3ac;
+}
+
+td {
+  border-bottom: 1px solid grey;
+}
+tr:nth-of-type(3) td,
+tr:nth-of-type(6) td {
+  border-bottom: 2px solid black;
+}
+
+td {
+  border-right: 1px solid grey;
+  margin: 0;
+}
+td span {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+}
+.guess {
+  font-size: 8px;
+  font-weight: italic;
+  color: grey;
+}
+td:nth-of-type(3),
+td:nth-of-type(6) {
+  border-right: 2px solid black;
+}
+td:last-of-type {
+  border-right: none;
+}
+
+tr:last-of-type td {
+  border-bottom: none;
 }
