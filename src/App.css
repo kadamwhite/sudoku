@@ -21,6 +21,15 @@
   color: #09d3ac;
 }
 
+button {
+  background: transparent;
+  display: block;
+  border: 0;
+  outline: 0;
+  margin: 0;
+  padding: 0;
+}
+
 td {
   border-bottom: 1px solid grey;
 }

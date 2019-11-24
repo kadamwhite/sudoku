@@ -45,7 +45,6 @@ const defaultLayout = [
 ];
 
 function isOriginal( rows, ri, ci ) {
-  console.log( rows[ ri ][ ci ], defaultLayout[ ri ][ ci ] );
   return rows[ ri ][ ci ] === defaultLayout[ ri ][ ci ];
 }
 
@@ -63,22 +62,6 @@ function canCellBe( rows, ri, ci, guess ) {
     if ( num === guess ) return false;
   }
   return true;
-}
-
-function cannotCellBe( rows, ri, ci, guess ) {
-  if ( rows[ ri ][ ci ] === guess ) {
-    return false;
-  }
-  for ( let num of getRow( rows, ri ) ) {
-    if ( num === guess ) return true;
-  }
-  for ( let num of getColumn( rows, ci ) ) {
-    if ( num === guess ) return true;
-  }
-  for ( let num of getSquare( rows, ri, ci ) ) {
-    if ( num === guess ) return true;
-  }
-  return false;
 }
 
 /**
@@ -124,15 +107,17 @@ function computeCells( rows ) {
   } ) );
 }
 
-const Cell = ( { value, original, possibilities } ) => {
+const Cell = ( { value, original, possibilities, onClick } ) => {
   const classNames = [
     original ? 'original' : '',
     possibilities ? 'guess' : '',
   ].filter( Boolean ).join( ' ' );
   return (
-    <span className={ classNames }>
-      { value || possibilities.join( ', ' ) }
-    </span>
+    <button type="button" onClick={ onClick }>
+      <span className={ classNames }>
+        { value || possibilities.join( ', ' ) }
+      </span>
+    </button>
   );
 };
 
@@ -149,7 +134,20 @@ function App() {
 
   const cells = computeCells( rows );
 
+  const optionUniqueInSet = ( cell, neighbors, option ) => {
+    for ( let neighbor of neighbors ) {
+      if ( neighbor === cell || neighbor.value === option || ! neighbor.possibilities ) {
+        continue;
+      }
+      if ( neighbor.possibilities.includes( option ) ) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   useEffect( () => {
+    // Check squares
     for ( let ri = 0; ri < 9; ri++ ) {
       for ( let ci = 0; ci < 9; ci++ ) {
         const cell = cells[ ri ][ ci ];
@@ -162,19 +160,9 @@ function App() {
           return;
         }
 
-        // No easy out; check each possibility against square's other cells.
-        const square = getSquare( cells, ri, ci );
+        // No easy out; exhaustively check each possibility.
         for ( let option of cell.possibilities ) {
-          let occurrences = 1;
-          for ( let neighbor of square ) {
-            if ( neighbor === cell || ! neighbor.possibilities ) {
-              continue;
-            }
-            if ( neighbor.possibilities.includes( option ) ) {
-              occurrences++;
-            }
-          }
-          if ( occurrences === 1 ) {
+          if ( optionUniqueInSet( cell, getSquare( cells, ri, ci ), option ) ) {
             updateCell( ri, ci, option );
             return;
           }
@@ -192,7 +180,13 @@ function App() {
               <tr key={ ri }>
                 {row.map(( cell, ci ) => (
                   <td key={ `${ ri }${ ci }` }>
-                    <Cell { ...cell } />
+                    <Cell
+                      { ...cell }
+                      onClick={ () => {
+                        const guess = window.prompt( 'Guess?' );
+                        updateCell( ri, ci, guess );
+                      } }
+                    />
                   </td>
                 ))}
               </tr>
