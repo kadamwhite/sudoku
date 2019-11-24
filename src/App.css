@@ -32,16 +32,24 @@ tr:nth-of-type(6) td {
 td {
   border-right: 1px solid grey;
   margin: 0;
+
 }
 td span {
   display: block;
   width: 2rem;
   height: 2rem;
 }
+.original {
+  font-weight: bold;
+  line-height: 2rem;
+  vertical-align: middle;
+}
 .guess {
   font-size: 8px;
   font-weight: italic;
   color: grey;
+  vertical-align: top;
+  text-align: left;
 }
 td:nth-of-type(3),
 td:nth-of-type(6) {

@@ -36,19 +36,25 @@ function getSquare( rows, ri, ci ) {
   return square;
 }
 
+const n = null;
+const defaultLayout = [
+  [1, n, n, n, n, n, n, n, n ],
+  [n, n, n, 1, n, n, 8, n, 2 ],
+  [n, n, 8, 9, n, n, 6, n, n ],
+  [4, n, n, 7, 6, n, n, 3, n ],
+  [n, 7, n, n, n, 4, n, 2, n ],
+  [n, 6, n, n, 1, 8, n, n, 7 ],
+  [n, n, 1, n, n, 9, 2, n, n ],
+  [2, n, 5, 6, n, 7, n, n, n ],
+  [n, n, n, n, n, n, n, n, 5 ],
+];
+
+function isOriginal( rows, ri, ci ) {
+  return rows[ ri ][ ci ] === defaultLayout[ ri ][ ci ];
+}
+
 function App() {
-  const n = null;
-  const [rows, setRows] = useState([
-    [1, n, n, n, n, n, n, n, n ],
-    [n, n, n, 1, n, n, 8, n, 2 ],
-    [n, n, 8, 9, n, n, 6, n, n ],
-    [4, n, n, 7, 6, n, n, 3, n ],
-    [n, 7, n, n, n, 4, n, 2, n ],
-    [n, 6, n, n, 1, 8, n, n, 7 ],
-    [n, n, 1, n, n, 9, 2, n, n ],
-    [2, n, 5, 6, n, 7, n, n, n ],
-    [n, n, n, n, n, n, n, n, 5 ],
-  ]);
+  const [rows, setRows] = useState( defaultLayout );
 
   /**
    * Build list of possible values for a cell
@@ -90,7 +96,9 @@ function App() {
           {rows.map(( row, ri ) => (
             <tr>{row.map(( cell, ci ) => (
               <td>{ cell ? (
-                <span>{ cell }</span>
+                <span className={
+                  isOriginal( rows, ri, ci ) ? 'original' : null
+                }>{ cell }</span>
               ) : (
                 <span className="guess">{ computeGuess( cell, ri, ci ) }</span>
               )}</td>
