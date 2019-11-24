@@ -93,7 +93,7 @@ function App() {
    * @param {Number}      ri   The index of the row
    * @param {Number}      ci   The index of the column
    */
-  function computeGuess( cell, ri, ci ) {
+  function computeGuess( rows, ri, ci ) {
     const options = [];
     for ( let guess = 1; guess < 10; guess++ ) {
       if ( canCellBe( rows, ri, ci, guess ) ) {
