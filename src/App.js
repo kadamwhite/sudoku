@@ -24,6 +24,14 @@ function getRange( index ) {
   return [6, 7, 8];
 }
 
+function getRow( rows, ri ) {
+  return rows[ ri ];
+}
+
+function getColumn( rows, ci ) {
+  return rows.map( row => row[ ci ] );
+}
+
 function getSquare( rows, ri, ci ) {
   let rowRange = getRange( ri );
   let colRange = getRange( ci );
@@ -53,8 +61,30 @@ function isOriginal( rows, ri, ci ) {
   return rows[ ri ][ ci ] === defaultLayout[ ri ][ ci ];
 }
 
+function canCellBe( rows, ri, ci, guess ) {
+  if ( rows[ ri ][ ci ] === guess ) {
+    return true;
+  }
+  for ( let num of getRow( rows, ri ) ) {
+    if ( num === guess ) return false;
+  }
+  for ( let num of getColumn( rows, ci ) ) {
+    if ( num === guess ) return false;
+  }
+  for ( let num of getSquare( rows, ri, ci ) ) {
+    if ( num === guess ) return false;
+  }
+  return true;
+}
+
+// function mustCellBe( rows, ri, ci, guess ) {
+//   if ( rows[ ri ][ ci ] === guess ) {
+//     return true;
+//   }
+// }
+
 function App() {
-  const [rows, setRows] = useState( defaultLayout );
+  const [ rows, setRows ] = useState( defaultLayout );
 
   /**
    * Build list of possible values for a cell
@@ -64,30 +94,13 @@ function App() {
    * @param {Number}      ci   The index of the column
    */
   function computeGuess( cell, ri, ci ) {
-    const available = {
-      ...options,
-    };
-    for ( let num of rows[ ri ] ) {
-      if ( num ) {
-        available[ num ] = false;
+    const options = [];
+    for ( let guess = 1; guess < 10; guess++ ) {
+      if ( canCellBe( rows, ri, ci, guess ) ) {
+        options.push( guess );
       }
     }
-    for ( let row of rows ) {
-      if ( row[ ci ] ) {
-        available[ row[ ci ] ] = false;
-      }
-    }
-    for ( let num of getSquare( rows, ri, ci ) ) {
-      if ( num ) {
-        available[ num ] = false;
-      }
-    }
-    return Object.keys( available ).reduce( ( guesses, num ) => {
-      if ( available[num] ) {
-        return guesses.concat( num );
-      }
-      return guesses;
-    }, [] ).join( ', ' );
+    return options.join( ', ' );
   }
   return (
     <div className="App">
