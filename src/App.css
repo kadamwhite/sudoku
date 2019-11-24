@@ -33,6 +33,7 @@ button {
 td {
   border-bottom: 1px solid grey;
 }
+
 tr:nth-of-type(3) td,
 tr:nth-of-type(6) td {
   border-bottom: 2px solid black;
@@ -41,7 +42,20 @@ tr:nth-of-type(6) td {
 td {
   border-right: 1px solid grey;
   margin: 0;
+}
 
+.validation {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 0 !important;
+}
+
+.valid {
+  color: #71ab71;
+}
+
+.invalid {
+  color: #ca2323;
 }
 
 td span {
@@ -50,7 +64,6 @@ td span {
   height: 2rem;
   line-height: 2rem;
   vertical-align: middle;
-  /* font-weight: lighter; */
 }
 
 .original {
@@ -72,6 +85,7 @@ td:nth-of-type(6) {
   border-right: 2px solid black;
 }
 
+td:nth-of-type(9),
 td:last-of-type {
   border-right: none;
 }

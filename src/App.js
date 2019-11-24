@@ -49,7 +49,9 @@ function isOriginal( rows, ri, ci ) {
 }
 
 function canCellBe( rows, ri, ci, guess ) {
+  if ( ri === 5 && ci === 7 ) console.log( `checking ${ guess }` );
   if ( rows[ ri ][ ci ] === guess ) {
+    if ( ri === 5 && ci === 7 ) console.log( `value already is ${ guess }` );
     return true;
   }
   for ( let num of getRow( rows, ri ) ) {
@@ -61,6 +63,7 @@ function canCellBe( rows, ri, ci, guess ) {
   for ( let num of getSquare( rows, ri, ci ) ) {
     if ( num === guess ) return false;
   }
+  if ( ri === 5 && ci === 7 ) console.log( `could be ${ guess }` );
   return true;
 }
 
@@ -107,6 +110,19 @@ function computeCells( rows ) {
   } ) );
 }
 
+function complete( set ) {
+  for ( let i = 0; i < set.length; i++ ) {
+    if ( ! set[ i ] || ! set[ i ].value ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+const valid = set => (
+  set.map( cell => `${ cell.value }` ).sort().join( '' ) === '123456789'
+);
+
 const Cell = ( { value, original, possibilities, onClick } ) => {
   const classNames = [
     original ? 'original' : '',
@@ -121,15 +137,30 @@ const Cell = ( { value, original, possibilities, onClick } ) => {
   );
 };
 
+const ValidationCell = ( { set } ) => {
+  console.log( set );
+  if ( ! complete( set ) ) {
+    return (
+      <td className="validation" />
+    );
+  }
+  const isValid = valid( set );
+  return (
+    <td className={ `validation ${ isValid ? 'valid' : 'invalid' }` }>
+      { isValid ? '\u2713' : '\u2A2F' }
+    </td>
+  );
+}
+
 function App() {
   const [ rows, setRows ] = useState( defaultLayout.map( row => [ ...row ] ) );
 
   function updateCell( ri, ci, value ) {
     setTimeout( () => {
       const newRows = [ ...rows ];
-      newRows[ ri ][ ci ] = value;
+      newRows[ ri ][ ci ] = +value;
       setRows( newRows );
-    }, 500 );
+    }, 50 );
   }
 
   const cells = computeCells( rows );
@@ -189,8 +220,14 @@ function App() {
                     />
                   </td>
                 ))}
+                <ValidationCell set={ row } />
               </tr>
             ))}
+            <tr>
+              { rows[0].map( ( _, ci ) => (
+                <ValidationCell set={ getColumn( cells, ci ) } key={ `col${ ci }valid` } />
+              ) ) }
+            </tr>
           </tbody>
         </table>
       </header>
