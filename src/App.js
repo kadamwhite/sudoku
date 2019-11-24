@@ -1,18 +1,5 @@
 import React, { useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
-
-const options = {
-  1: true,
-  2: true,
-  3: true,
-  4: true,
-  5: true,
-  6: true,
-  7: true,
-  8: true,
-  9: true,
-};
 
 function getRange( index ) {
   if ( index < 3 ) {
@@ -77,46 +64,98 @@ function canCellBe( rows, ri, ci, guess ) {
   return true;
 }
 
-// function mustCellBe( rows, ri, ci, guess ) {
-//   if ( rows[ ri ][ ci ] === guess ) {
-//     return true;
-//   }
-// }
+function cannotCellBe( rows, ri, ci, guess ) {
+  if ( rows[ ri ][ ci ] === guess ) {
+    return false;
+  }
+  for ( let num of getRow( rows, ri ) ) {
+    if ( num === guess ) return true;
+  }
+  for ( let num of getColumn( rows, ci ) ) {
+    if ( num === guess ) return true;
+  }
+  for ( let num of getSquare( rows, ri, ci ) ) {
+    if ( num === guess ) return true;
+  }
+  return false;
+}
+
+/**
+ * Build list of possible values for a cell.
+ *
+ * @param {Array}  rows The array of cells.
+ * @param {Number} ri   The index of the row.
+ * @param {Number} ci   The index of the column.
+ *
+ * @returns {Array} The possible values for the specified cell.
+ */
+function computePossibilities( rows, ri, ci ) {
+  const options = [];
+  for ( let guess = 1; guess < 10; guess++ ) {
+    if ( canCellBe( rows, ri, ci, guess ) ) {
+      options.push( guess );
+    }
+  }
+  return options;
+}
+
+/**
+ * Compute the possibilities and values for the grid of cells.
+ *
+ * @param {Array} rows The array of cells.
+ *
+ * @return {Array} Computed cell data.
+ */
+function computeCells( rows ) {
+  return rows.map( ( row, ri ) => row.map( ( cell, ci ) => {
+    if ( cell ) {
+      return {
+        value: cell,
+        possibilities: null,
+        original: isOriginal( rows, ri, ci ),
+      };
+    }
+    return {
+      value: null,
+      possibilities: computePossibilities( rows, ri, ci ),
+      original: false,
+    };
+  } ) );
+}
+
+const Cell = ( { value, original, possibilities } ) => {
+  const classNames = [
+    original ? 'original' : '',
+    possibilities ? 'guess' : '',
+  ].filter( Boolean ).join( ' ' );
+  return (
+    <span className={ classNames }>
+      { value || possibilities.join( ', ' ) }
+    </span>
+  );
+};
 
 function App() {
   const [ rows, setRows ] = useState( defaultLayout );
 
-  /**
-   * Build list of possible values for a cell
-   *
-   * @param {Number|null} cell A known cell, or null
-   * @param {Number}      ri   The index of the row
-   * @param {Number}      ci   The index of the column
-   */
-  function computeGuess( ri, ci ) {
-    const options = [];
-    for ( let guess = 1; guess < 10; guess++ ) {
-      if ( canCellBe( rows, ri, ci, guess ) ) {
-        options.push( guess );
-      }
-    }
-    return options.join( ', ' );
-  }
+  const cells = computeCells( rows );
+
+
   return (
     <div className="App">
       <header className="App-header">
         <table cellSpacing={0}>
-          {rows.map(( row, ri ) => (
-            <tr>{row.map(( cell, ci ) => (
-              <td>{ cell ? (
-                <span className={
-                  isOriginal( rows, ri, ci ) ? 'original' : null
-                }>{ cell }</span>
-              ) : (
-                <span className="guess">{ computeGuess( ri, ci ) }</span>
-              )}</td>
-            ))}</tr>
-          ))}
+          <tbody>
+            {cells.map(( row, ri ) => (
+              <tr key={ ri }>
+                {row.map(( cell, ci ) => (
+                  <td key={ `${ ri }${ ci }` }>
+                    <Cell { ...cell } />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
         </table>
       </header>
     </div>
