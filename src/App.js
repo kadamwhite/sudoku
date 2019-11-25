@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import './App.css';
 
 function getRange( index ) {
@@ -120,6 +120,18 @@ const valid = set => (
   set.map( cell => `${ cell.value }` ).sort().join( '' ) === '123456789'
 );
 
+function optionUniqueInSet( cell, neighbors, option ) {
+  for ( let neighbor of neighbors ) {
+    if ( neighbor === cell || neighbor.value === option || ! neighbor.possibilities ) {
+      continue;
+    }
+    if ( neighbor.possibilities.includes( option ) ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 const Cell = ( { value, original, possibilities, onClick } ) => {
   const classNames = [
     original ? 'original' : '',
@@ -150,31 +162,19 @@ const ValidationCell = ( { set } ) => {
 
 function App() {
   const [ rows, setRows ] = useState( defaultLayout.map( row => [ ...row ] ) );
+  const [ showGuessButton, outOfOptions ] = useState( false );
 
-  function updateCell( ri, ci, value ) {
+  const updateCell = useCallback( ( ri, ci, value ) => {
     setTimeout( () => {
       const newRows = [ ...rows ];
       newRows[ ri ][ ci ] = +value;
       setRows( newRows );
     }, 50 );
-  }
+  }, [ rows, setRows ] );
 
   const cells = computeCells( rows );
 
-  const optionUniqueInSet = ( cell, neighbors, option ) => {
-    for ( let neighbor of neighbors ) {
-      if ( neighbor === cell || neighbor.value === option || ! neighbor.possibilities ) {
-        continue;
-      }
-      if ( neighbor.possibilities.includes( option ) ) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   useEffect( () => {
-    // Check squares
     for ( let ri = 0; ri < 9; ri++ ) {
       for ( let ci = 0; ci < 9; ci++ ) {
         const cell = cells[ ri ][ ci ];
@@ -196,7 +196,8 @@ function App() {
         }
       }
     }
-  } );
+    outOfOptions(true);
+  }, [ cells, updateCell ] );
 
   return (
     <div className="App">
@@ -226,6 +227,9 @@ function App() {
             </tr>
           </tbody>
         </table>
+        { showGuessButton ? (
+          <button type="button" onClick={ () => {} }>Guess!</button>
+        ) : null }
       </header>
     </div>
   );
