@@ -34,7 +34,7 @@ function getSquare( rows, ri, ci ) {
 const n = null;
 const defaultLayout = [
   [1, n, n, n, n, n, n, n, n ],
-  [n, n, n, 1, n, n, 8, n, 2 ],
+  [n, n, n, 1, n, 6, 8, n, 2 ],
   [n, n, 8, 9, n, n, 6, n, n ],
   [4, n, n, 7, 6, n, n, 3, n ],
   [n, 7, n, n, n, 4, n, 2, n ],
@@ -160,9 +160,28 @@ const ValidationCell = ( { set } ) => {
   );
 }
 
+function isComplete( rows ) {
+  for ( let row of rows ) {
+    for ( let cell of row ) {
+      if ( cell === null || cell.value === null ) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+function random( arr ) {
+  const idx = Math.floor( Math.random() * arr.length );
+  return arr[ idx ];
+}
+
+const clone = arr => arr.map( subArr => [ ...subArr ] );
+
 function App() {
-  const [ rows, setRows ] = useState( defaultLayout.map( row => [ ...row ] ) );
+  const [ rows, setRows ] = useState( clone( defaultLayout ) );
   const [ showGuessButton, outOfOptions ] = useState( false );
+  const [ beforeGuess, saveSnapshot ] = useState( null );
 
   const updateCell = useCallback( ( ri, ci, value ) => {
     setTimeout( () => {
@@ -227,9 +246,33 @@ function App() {
             </tr>
           </tbody>
         </table>
-        { showGuessButton ? (
-          <button type="button" onClick={ () => {} }>Guess!</button>
-        ) : null }
+        { beforeGuess ? ( 
+          <button type="button" onClick={ () => {
+            // If we get to this again, we've failed; reset!
+            setRows( beforeGuess );
+            saveSnapshot( null );
+          } }>Reset</button>
+         ) : (
+          ! isComplete( cells ) && showGuessButton ? (
+            <button type="button" onClick={ () => {
+              const unknownCells = cells.reduce( ( options, row, ri ) => {
+                row.forEach( ( cell, ci ) => {
+                  if ( cell.value ) {
+                    return;
+                  }
+                  options.push( [ cell, ri, ci ] );
+                } );
+                return options;
+              }, [] );
+              const [ cell, ri, ci ] = random( unknownCells );
+
+              // Try it!
+              saveSnapshot( clone( rows ) );
+              updateCell( ri, ci, random( cell.possibilities ) );
+              outOfOptions( false );
+            } }>Guess!</button>
+          ) : null
+        ) }
       </header>
     </div>
   );
