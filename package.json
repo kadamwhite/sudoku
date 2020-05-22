@@ -1,5 +1,6 @@
 {
   "name": "sudoku",
+  "description": "A naive sudoku solver built for personal amusement over Thanksgiving 2019",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
