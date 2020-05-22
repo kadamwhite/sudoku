@@ -32,7 +32,10 @@ function getSquare( rows, ri, ci ) {
 }
 
 const _ = null;
-const defaultLayout = [
+// Permit injecting a layout via localStorage
+let storedLayout = localStorage.getItem( 'layout' );
+storedLayout = storedLayout ? JSON.parse( storedLayout ) : null;
+const defaultLayout = storedLayout || [
   [1, _, _, _, _, _, _, _, _ ],
   [_, _, _, 1, _, 6, 8, _, 2 ],
   [_, _, 8, 9, _, _, 6, _, _ ],
